@@ -1,0 +1,13 @@
+{
+  "name": "chat-app-react",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "my-app"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=backend & npm run dev --workspace=my-app",
+    "build": "npm run build --workspace=my-app",
+    "start": "npm run start --workspace=backend"
+  }
+}

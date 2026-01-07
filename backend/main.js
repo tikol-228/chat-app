@@ -10,14 +10,23 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = createServer(app);
+
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://chat-app-my-app-three.vercel.app" // твой фронтенд на Vercel
+    ],
     methods: ["GET", "POST"]
   }
-});
+})
 
-const PORT = 3000;
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://chat-app-my-app-three.vercel.app"
+  ]
+})) 
 
 const messages = [];
 

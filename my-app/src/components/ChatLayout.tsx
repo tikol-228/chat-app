@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import io from 'socket.io-client'
 import styles from './ChatLayout.module.css'
 
@@ -7,6 +7,8 @@ interface Message {
   text: string
   sender: string
 }
+
+const SERVER_URL = import.meta.env.VITE_SERVER_URL
 
 const ChatLayout = () => {
   const [messages, setMessages] = useState<Message[]>([])
@@ -17,47 +19,49 @@ const ChatLayout = () => {
   const [onlineUsers, setOnlineUsers] = useState<string[]>([])
 
   useEffect(() => {
-    if (isLoggedIn) {
-      const newSocket = io('http://localhost:3000')
-      setSocket(newSocket)
+    if (!isLoggedIn || !SERVER_URL) return
 
-      newSocket.emit('join', username)
+    const newSocket = io(SERVER_URL, {
+      transports: ['websocket'],
+    })
 
-      newSocket.on('newMessage', (message: Message) => {
-        setMessages(prev => [...prev, message])
-      })
+    setSocket(newSocket)
+    newSocket.emit('join', username)
 
-      newSocket.on('userJoined', (user: string) => {
-        setOnlineUsers(prev => [...prev, user])
-        setMessages(prev => [
-          ...prev,
-          { id: Date.now(), text: `${user} joined the chat`, sender: 'System' }
-        ])
-      })
+    newSocket.on('newMessage', (message: Message) => {
+      setMessages(prev => [...prev, message])
+    })
 
-      newSocket.on('userLeft', (user: string) => {
-        setOnlineUsers(prev => prev.filter(u => u !== user))
-        setMessages(prev => [
-          ...prev,
-          { id: Date.now(), text: `${user} left the chat`, sender: 'System' }
-        ])
-      })
+    newSocket.on('userJoined', (user: string) => {
+      setOnlineUsers(prev => [...prev, user])
+      setMessages(prev => [
+        ...prev,
+        { id: Date.now(), text: `${user} joined the chat`, sender: 'System' }
+      ])
+    })
 
-      newSocket.on('onlineUsers', (users: string[]) => {
-        setOnlineUsers(users)
-      })
+    newSocket.on('userLeft', (user: string) => {
+      setOnlineUsers(prev => prev.filter(u => u !== user))
+      setMessages(prev => [
+        ...prev,
+        { id: Date.now(), text: `${user} left the chat`, sender: 'System' }
+      ])
+    })
 
-      fetchMessages()
+    newSocket.on('onlineUsers', (users: string[]) => {
+      setOnlineUsers(users)
+    })
 
-      return () => {
-        newSocket.close()
-      }
+    fetchMessages()
+
+    return () => {
+      newSocket.disconnect()
     }
   }, [isLoggedIn, username])
 
   const fetchMessages = async () => {
     try {
-      const response = await fetch('http://localhost:3000/messages')
+      const response = await fetch(`${SERVER_URL}/messages`)
       const data = await response.json()
       setMessages(data)
     } catch (error) {
@@ -72,19 +76,9 @@ const ChatLayout = () => {
     }
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') sendMessage()
-  }
-
   const handleLogin = () => {
     if (username.trim()) setIsLoggedIn(true)
   }
-
-  const handleLoginKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') handleLogin()
-  }
-
-  /* ================= LOGIN ================= */
 
   if (!isLoggedIn) {
     return (
@@ -96,7 +90,7 @@ const ChatLayout = () => {
           <input
             value={username}
             onChange={e => setUsername(e.target.value)}
-            onKeyPress={handleLoginKeyPress}
+            onKeyDown={e => e.key === 'Enter' && handleLogin()}
             placeholder="Your name..."
           />
 
@@ -105,8 +99,6 @@ const ChatLayout = () => {
       </div>
     )
   }
-
-  /* ================= CHAT ================= */
 
   return (
     <div className={styles.root}>
@@ -125,7 +117,6 @@ const ChatLayout = () => {
         </aside>
 
         <main className={styles.main}>
-
           <header className={styles.header}>
             <h2>Chat</h2>
             <span>You are: {username}</span>
@@ -155,12 +146,11 @@ const ChatLayout = () => {
             <input
               value={input}
               onChange={e => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={e => e.key === 'Enter' && sendMessage()}
               placeholder="Type a message..."
             />
             <button onClick={sendMessage}>Send</button>
           </div>
-
         </main>
 
       </div>

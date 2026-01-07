@@ -15,7 +15,8 @@ const io = new Server(server, {
   cors: {
     origin: [
       "http://localhost:5173",
-      "https://chat-app-my-app-three.vercel.app" // твой фронтенд на Vercel
+      "https://chat-app-my-app-three.vercel.app", // твой фронтенд на Vercel
+      "https://chat-app-my-4317suddi-tikols-projects-0064ee57.vercel.app" // обновленный URL
     ],
     methods: ["GET", "POST"]
   }
@@ -24,7 +25,8 @@ const io = new Server(server, {
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://chat-app-my-app-three.vercel.app"
+    "https://chat-app-my-app-three.vercel.app",
+    "https://chat-app-my-4317suddi-tikols-projects-0064ee57.vercel.app"
   ]
 })) 
 

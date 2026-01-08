@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import os from 'os';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,27 +16,18 @@ const server = createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: [
-      "http://localhost:5173",
-      "https://chat-app-my-app-three.vercel.app", // твой фронтенд на Vercel
-      "https://chat-app-my-4317suddi-tikols-projects-0064ee57.vercel.app" // обновленный URL
-    ],
+    origin: true, // Allow all origins for local network access
     methods: ["GET", "POST"]
   }
 })
 
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://chat-app-my-app-three.vercel.app",
-    "https://chat-app-my-4317suddi-tikols-projects-0064ee57.vercel.app"
-  ]
+  origin: true // Allow all origins
 })) 
 
 const messages = [];
 
 app.use(express.json());
-app.use(cors());
 
 // Serve static files from the React app build directory
 app.use(express.static(path.join(__dirname, '../my-app/dist')));
@@ -98,5 +90,21 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
+  const networkInterfaces = os.networkInterfaces();
+  const addresses = [];
+  for (const interfaceName in networkInterfaces) {
+    const interfaces = networkInterfaces[interfaceName];
+    for (const iface of interfaces) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        addresses.push(iface.address);
+      }
+    }
+  }
   console.log(`Server is running on port ${PORT}`);
+  console.log(`Local access: http://localhost:${PORT}`);
+  if (addresses.length > 0) {
+    console.log(`Network access: ${addresses.map(addr => `http://${addr}:${PORT}`).join(', ')}`);
+  } else {
+    console.log('No network interfaces found for external access.');
+  }
 });

@@ -8,8 +8,6 @@ interface Message {
   sender: string
 }
 
-const SERVER_URL = import.meta.env.VITE_SERVER_URL
-
 const ChatLayout = () => {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -19,9 +17,9 @@ const ChatLayout = () => {
   const [onlineUsers, setOnlineUsers] = useState<string[]>([])
 
   useEffect(() => {
-    if (!isLoggedIn || !SERVER_URL) return
+    if (!isLoggedIn) return
 
-    const newSocket = io(SERVER_URL, {
+    const newSocket = io({
       transports: ['websocket'],
     })
 
@@ -61,7 +59,7 @@ const ChatLayout = () => {
 
   const fetchMessages = async () => {
     try {
-      const response = await fetch(`${SERVER_URL}/messages`)
+      const response = await fetch('/messages')
       const data = await response.json()
       setMessages(data)
     } catch (error) {

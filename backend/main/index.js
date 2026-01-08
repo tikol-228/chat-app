@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import os from 'os';
+import { setupWebRTCHandlers } from './webrtc.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,7 +31,7 @@ const messages = [];
 app.use(express.json());
 
 // Serve static files from the React app build directory
-app.use(express.static(path.join(__dirname, '../my-app/dist')));
+app.use(express.static(path.join(__dirname, '../../my-app/dist')));
 
 app.get('/', (req, res) => {
   res.send('Hello from the backend!');
@@ -52,16 +53,18 @@ app.post('/messages', (req, res) => {
 
 // ✅ Catch-all route for new path-to-regexp (v7+)
 app.get('/*path', (req, res) => {
-  res.sendFile(path.join(__dirname, '../my-app/dist/index.html'));
+  res.sendFile(path.join(__dirname, '../../my-app/dist/index.html'));
 });
 
 const onlineUsers = [];
+const userSockets = {};
 
 io.on('connection', (socket) => {
   console.log('a user connected');
 
   socket.on('join', (username) => {
     socket.username = username;
+    userSockets[username] = socket.id;
     if (!onlineUsers.includes(username)) {
       onlineUsers.push(username);
     }
@@ -76,8 +79,12 @@ io.on('connection', (socket) => {
     io.emit('newMessage', newMessage);
   });
 
+  // Setup WebRTC handlers
+  setupWebRTCHandlers(io, socket, userSockets);
+
   socket.on('disconnect', () => {
     if (socket.username) {
+      delete userSockets[socket.username];
       const index = onlineUsers.indexOf(socket.username);
       if (index > -1) {
         onlineUsers.splice(index, 1);

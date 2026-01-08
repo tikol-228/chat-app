@@ -1,9 +1,9 @@
 {
   "type": "module",
   "scripts": {
-    "dev": "nodemon main.js",
+    "dev": "nodemon main/index.js",
     "build": "cd ../my-app && npm run build",
-    "start": "node main.js"
+    "start": "node main/index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

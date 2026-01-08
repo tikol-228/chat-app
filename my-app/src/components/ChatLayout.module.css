@@ -1,8 +1,6 @@
 .root {
   height: 100vh;
-  display: flex;
-  justify-content: center;
-  padding: 20px;
+  width: 100vw;
   background: #0f172a;
 }
 
@@ -50,12 +48,9 @@
 
 .card {
   background: #020617;
-  width: 100%;
-  max-width: 1100px;
+  width: 100vw;
+  height: 100vh;
   display: flex;
-  border-radius: 22px;
-  overflow: hidden;
-  box-shadow: 0 30px 80px rgba(0,0,0,.6);
 }
 
 /* SIDEBAR */
@@ -80,6 +75,25 @@
   opacity: .9;
 }
 
+.callButton {
+  margin-left: auto;
+  background: #22c55e;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.callButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .dot {
   width: 8px;
   height: 8px;
@@ -99,6 +113,24 @@
   padding: 16px 20px;
   border-bottom: 1px solid #0f172a;
   color: white;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.headerCallButton {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #22c55e;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.headerCallButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* MESSAGES */
@@ -191,4 +223,98 @@
     border-top: 1px solid #0f172a;
     order: 2;
   }
+}
+
+/* CALL NOTIFICATIONS */
+
+.callNotification {
+  background: #1e293b;
+  padding: 12px 20px;
+  border-bottom: 1px solid #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+}
+
+.callNotification p {
+  margin: 0;
+  flex: 1;
+}
+
+.callNotification button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.callNotification button:first-of-type {
+  background: #22c55e;
+  color: white;
+}
+
+.callNotification button:last-of-type {
+  background: #ef4444;
+  color: white;
+}
+
+.callActive {
+  background: #1e293b;
+  padding: 12px 20px;
+  border-bottom: 1px solid #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+}
+
+.callActive p {
+  margin: 0;
+}
+
+.callActive button {
+  padding: 8px 16px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* INPUT BAR */
+
+.inputBar {
+  padding: 20px;
+  border-top: 1px solid #0f172a;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.inputBar input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  background: #0f172a;
+  color: white;
+}
+
+.inputBar button {
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #6366f1;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.inputBar button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

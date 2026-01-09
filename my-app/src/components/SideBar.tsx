@@ -1,11 +1,15 @@
 import styles from './SideBar.module.css'
+import { Link } from 'react-router-dom'
+import Profile from './Profile'
 import { useState } from 'react'
 
 interface SideBarProps {
   onlineUsers: string[]
+  currentChat: string | null
+  setCurrentChat: (chat: string | null) => void
 }
 
-const SideBar = ({ onlineUsers }: SideBarProps) => {
+const SideBar = ({ onlineUsers, currentChat, setCurrentChat }: SideBarProps) => {
   const [chats, setChats] = useState<string[]>([])
 
   const handleAddChat = () => {
@@ -25,6 +29,7 @@ const SideBar = ({ onlineUsers }: SideBarProps) => {
       <button onClick={handleAddChat} className={styles.addChatBtn}>
         Add Chat
       </button>
+      <Link to="/profile">Profile</Link>
 
       <ul>
         {onlineUsers.map(user => (
@@ -36,8 +41,9 @@ const SideBar = ({ onlineUsers }: SideBarProps) => {
       </ul>
          
       <ul>
+        <li onClick={() => setCurrentChat(null)} className={currentChat === null ? styles.active : ''}>General</li>
         {chats.map(chat => (
-          <li key={chat}>{chat}</li>
+          <li key={chat} onClick={() => setCurrentChat(chat)} className={currentChat === chat ? styles.active : ''}>{chat}</li>
         ))}
       </ul>
     </aside>

@@ -48,6 +48,11 @@
   background: rgba(255,255,255,.05);
 }
 
+.active {
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+
 .dot {
   width: 9px;
   height: 9px;

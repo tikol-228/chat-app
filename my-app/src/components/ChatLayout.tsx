@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Profile from './Profile'
 import io from 'socket.io-client'
 import styles from './ChatLayout.module.css'
 import SideBar from './SideBar'
@@ -7,6 +8,7 @@ interface Message {
   id: number
   text: string
   sender: string
+  chat?: string
 }
 
 const ChatLayout = () => {
@@ -17,6 +19,7 @@ const ChatLayout = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [onlineUsers, setOnlineUsers] = useState<string[]>([])
   const [contextMenu, setContextMenu] = useState<{visible: boolean, x: number, y: number, messageId?: number}>({visible: false, x: 0, y: 0})
+  const [currentChat, setCurrentChat] = useState<string | null>(null)
   
   useEffect(() => {
     if (!isLoggedIn) return
@@ -71,7 +74,7 @@ const ChatLayout = () => {
 
   const sendMessage = () => {
     if (input.trim() && socket && username) {
-      socket.emit('sendMessage', { text: input, sender: username })
+      socket.emit('sendMessage', { text: input, sender: username, chat: currentChat })
       setInput('')
     }
   }
@@ -113,32 +116,35 @@ const ChatLayout = () => {
     <div className={styles.root} onClick={() => setContextMenu({visible: false, x: 0, y: 0})}>
       <div className={styles.card}>
 
-        <SideBar onlineUsers={onlineUsers} />
+        <SideBar onlineUsers={onlineUsers} currentChat={currentChat} setCurrentChat={setCurrentChat} />
 
         <main className={styles.main}>
           <header className={styles.header}>
-            <h2>Chat</h2>
+            <h2>{currentChat ? `Chat with ${currentChat}` : 'General Chat'}</h2>
             <span>You are: {username}</span>
           </header>
-
+        
           <div className={styles.messages}>
-            {messages.map(m => {
-              const type =
-                m.sender === 'System'
-                  ? styles.system
-                  : m.sender === username
-                  ? styles.own
-                  : styles.other
+            {(() => {
+              const filteredMessages = currentChat ? messages.filter(m => m.chat === currentChat || m.sender === 'System') : messages
+              return filteredMessages.map(m => {
+                const type =
+                  m.sender === 'System'
+                    ? styles.system
+                    : m.sender === username
+                    ? styles.own
+                    : styles.other
 
-              return (
-                <div key={m.id} className={`${styles.message} ${type}`} onContextMenu={(e) => { e.preventDefault(); setContextMenu({visible: true, x: e.clientX, y: e.clientY, messageId: m.id}) }}>
-                  {m.sender !== 'System' && (
-                    <div className={styles.sender}>{m.sender}</div>
-                  )}
-                  <div className={styles.bubble}>{m.text}</div>
-                </div>
-              )
-            })}
+                return (
+                  <div key={m.id} className={`${styles.message} ${type}`} onContextMenu={(e) => { e.preventDefault(); setContextMenu({visible: true, x: e.clientX, y: e.clientY, messageId: m.id}) }}>
+                    {m.sender !== 'System' && (
+                      <div className={styles.sender}>{m.sender}</div>
+                    )}
+                    <div className={styles.bubble}>{m.text}</div>
+                  </div>
+                )
+              })
+            })()}
           </div>
 
           {contextMenu.visible && (

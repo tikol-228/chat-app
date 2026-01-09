@@ -1,0 +1,143 @@
+.profilePage {
+  min-height: 100vh;
+  background: #0f1115;
+  color: #fff;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-family: system-ui, sans-serif;
+}
+
+/* Header */
+
+.header {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  background: #151922;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #3b82f6;
+}
+
+.mainInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.name {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.status {
+  color: #22c55e;
+  font-size: 14px;
+}
+
+/* Actions */
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.actions button {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: #1f2937;
+  color: #fff;
+  transition: 0.2s;
+}
+
+.actions button:hover {
+  background: #3b82f6;
+}
+
+/* Blocks */
+
+.block {
+  background: #151922;
+  padding: 20px 24px;
+  border-radius: 16px;
+}
+
+.block h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+/* Info */
+
+.infoList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #cbd5e1;
+}
+
+/* Stats */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.stats div {
+  background: #151922;
+  padding: 20px;
+  border-radius: 16px;
+  text-align: center;
+}
+
+.stats h4 {
+  font-size: 14px;
+  color: #94a3b8;
+  margin-bottom: 6px;
+}
+
+.stats span {
+  font-size: 26px;
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+.avatarWrapper {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #1f2937;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.emptyAvatar {
+  color: #94a3b8;
+  font-size: 14px;
+}

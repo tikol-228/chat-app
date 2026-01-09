@@ -15,7 +15,7 @@ const ChatLayout = () => {
   const [username, setUsername] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [onlineUsers, setOnlineUsers] = useState<string[]>([])
-
+  const [contextMenu, setContextMenu] = useState<{visible: boolean, x: number, y: number, messageId?: number}>({visible: false, x: 0, y: 0})
   useEffect(() => {
     if (!isLoggedIn) return
 
@@ -74,6 +74,15 @@ const ChatLayout = () => {
     }
   }
 
+  const deleteMessage = async (id: number) => {
+    try {
+      await fetch(`/messages/${id}`, { method: 'DELETE' })
+      setMessages(prev => prev.filter(m => m.id !== id))
+    } catch (error) {
+      console.error('Error deleting message:', error)
+    }
+  }
+
   const handleLogin = () => {
     if (username.trim()) setIsLoggedIn(true)
   }
@@ -99,7 +108,7 @@ const ChatLayout = () => {
   }
 
   return (
-    <div className={styles.root}>
+    <div className={styles.root} onClick={() => setContextMenu({visible: false, x: 0, y: 0})}>
       <div className={styles.card}>
 
         <aside className={styles.sidebar}>
@@ -130,7 +139,7 @@ const ChatLayout = () => {
                   : styles.other
 
               return (
-                <div key={m.id} className={`${styles.message} ${type}`}>
+                <div key={m.id} className={`${styles.message} ${type}`} onContextMenu={(e) => { e.preventDefault(); setContextMenu({visible: true, x: e.clientX, y: e.clientY, messageId: m.id}) }}>
                   {m.sender !== 'System' && (
                     <div className={styles.sender}>{m.sender}</div>
                   )}
@@ -139,6 +148,12 @@ const ChatLayout = () => {
               )
             })}
           </div>
+
+          {contextMenu.visible && (
+            <div className={styles.contextMenu} style={{ left: contextMenu.x, top: contextMenu.y }}>
+              <button onClick={() => { if (contextMenu.messageId) deleteMessage(contextMenu.messageId); setContextMenu({visible: false, x: 0, y: 0}) }}>Delete</button>
+            </div>
+          )}
 
           <div className={styles.inputBar}>
             <input

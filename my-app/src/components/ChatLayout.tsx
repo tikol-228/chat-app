@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import io from 'socket.io-client'
 import styles from './ChatLayout.module.css'
+import SideBar from './SideBar'
 
 interface Message {
   id: number
@@ -16,6 +17,7 @@ const ChatLayout = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [onlineUsers, setOnlineUsers] = useState<string[]>([])
   const [contextMenu, setContextMenu] = useState<{visible: boolean, x: number, y: number, messageId?: number}>({visible: false, x: 0, y: 0})
+  
   useEffect(() => {
     if (!isLoggedIn) return
 
@@ -111,17 +113,7 @@ const ChatLayout = () => {
     <div className={styles.root} onClick={() => setContextMenu({visible: false, x: 0, y: 0})}>
       <div className={styles.card}>
 
-        <aside className={styles.sidebar}>
-          <h3>Online ({onlineUsers.length})</h3>
-          <ul>
-            {onlineUsers.map(user => (
-              <li key={user}>
-                <span className={styles.dot} />
-                {user}
-              </li>
-            ))}
-          </ul>
-        </aside>
+        <SideBar onlineUsers={onlineUsers} />
 
         <main className={styles.main}>
           <header className={styles.header}>

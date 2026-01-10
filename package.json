@@ -9,5 +9,10 @@
     "dev": "npm run dev --workspace=backend & npm run dev --workspace=my-app",
     "build": "npm run build --workspace=my-app",
     "start": "npm run start --workspace=backend"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.12.0"
   }
 }

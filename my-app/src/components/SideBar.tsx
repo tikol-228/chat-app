@@ -1,6 +1,5 @@
 import styles from './SideBar.module.css'
 import { Link } from 'react-router-dom'
-import Profile from './Profile'
 import { useState } from 'react'
 
 interface SideBarProps {

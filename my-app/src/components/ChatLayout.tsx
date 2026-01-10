@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import Profile from './Profile'
 import io from 'socket.io-client'
 import styles from './ChatLayout.module.css'
 import SideBar from './SideBar'

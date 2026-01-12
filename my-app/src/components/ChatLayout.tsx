@@ -24,7 +24,7 @@ const ChatLayout = () => {
   useEffect(() => {
     if (!user || !token) return
 
-    const newSocket = io('http://localhost:3000', {
+    const newSocket = io({
       auth: { token },
       transports: ['websocket'],
     })
@@ -65,7 +65,7 @@ const ChatLayout = () => {
 
   const fetchMessages = async () => {
     try {
-      const response = await fetch('http://localhost:3000/messages', {
+      const response = await fetch('/api/messages', {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = await response.json()
@@ -84,7 +84,7 @@ const ChatLayout = () => {
 
   const deleteMessage = async (id: number) => {
     try {
-      await fetch(`http://localhost:3000/messages/${id}`, { 
+      await fetch(`/api/messages/${id}`, { 
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       })

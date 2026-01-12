@@ -43,7 +43,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const response = await axios.post('http://localhost:3000/login', { email, password });
+    const response = await axios.post('/api/login', { email, password });
     const { token, user } = response.data;
     setToken(token);
     setUser(user);
@@ -52,7 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const register = async (name: string, email: string, password: string) => {
-    const response = await axios.post('http://localhost:3000/register', { name, email, password });
+    const response = await axios.post('/api/register', { name, email, password });
     const { token, user } = response.data;
     setToken(token);
     setUser(user);

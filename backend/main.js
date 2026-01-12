@@ -17,10 +17,10 @@ const JWT_SECRET = 'your-secret-key'; // In production, use environment variable
 const app = express();
 const server = createServer(app);
 
-app.use(cors({ origin: 'https://https://backend-production-9f01.up.railway.app/' }));  // Замените на реальный URL фронтенда
+app.use(cors({ origin: 'https://backend-production-9f01.up.railway.app' }));  // Замените на реальный URL фронтенда
 const io = new Server(server, {
   cors: {
-    origin: 'https://https://backend-production-9f01.up.railway.app/',
+    origin: 'https://backend-production-9f01.up.railway.app',
     methods: ["GET", "POST"]
   }
 });

@@ -82,16 +82,46 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: rgba(15, 23, 42, 0.4);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.headerInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.headerActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
 .header h2 {
   font-size: 18px;
   font-weight: 600;
+  margin: 0;
 }
 
 .header span {
   font-size: 13px;
   opacity: .6;
+}
+
+.callBtn {
+  background: transparent;
+  border: 1px solid rgba(129, 140, 248, 0.3);
+  color: #818cf8;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.callBtn:hover {
+  background: rgba(129, 140, 248, 0.1);
+  border-color: #818cf8;
 }
 
 /* ===== MESSAGES ===== */

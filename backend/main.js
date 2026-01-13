@@ -109,7 +109,29 @@ app.post('/api/login', async (req, res) => {
 });
 
 app.get('/api/messages', authenticateToken, (req, res) => {
-  res.json(messages);
+  const { chat } = req.query;
+  const userEmail = req.user.email;
+
+  const filteredMessages = messages.filter(msg => {
+    if (chat) {
+      // Private chat: (me & them) OR (them & me)
+      // Group chat: msg.chat === chat
+      
+      // If 'chat' param looks like an email, assume private chat logic
+      if (chat.includes('@')) {
+        return (msg.sender === userEmail && msg.chat === chat) ||
+               (msg.sender === chat && msg.chat === userEmail);
+      } else {
+        // Group/Room logic
+        return msg.chat === chat;
+      }
+    } else {
+      // General chat: messages with no 'chat' field
+      return !msg.chat;
+    }
+  });
+
+  res.json(filteredMessages);
 });
 
 app.post('/api/messages', authenticateToken, (req, res) => {
@@ -149,6 +171,8 @@ io.on('connection', (socket) => {
   socket.on('join', () => {
     const username = socket.user.email;
     socket.username = username;
+    socket.join(username); // Join personal room for private messages
+    socket.join('general'); // Join general room
 
     if (!onlineUsers.includes(username)) {
       onlineUsers.push(username);
@@ -156,6 +180,11 @@ io.on('connection', (socket) => {
 
     io.emit('userJoined', username);
     io.emit('onlineUsers', onlineUsers);
+  });
+
+  socket.on('joinRoom', (room) => {
+    socket.join(room);
+    console.log(`${socket.user.email} joined room: ${room}`);
   });
 
   socket.on('sendMessage', (data) => {
@@ -167,7 +196,25 @@ io.on('connection', (socket) => {
     };
 
     messages.push(newMessage);
-    io.emit('newMessage', newMessage);
+
+    if (data.chat) {
+      // Check if it's a private chat (email format) or a group room
+      // Simple heuristic: if it contains '@', it's likely a user email (private)
+      // Otherwise, treat as a room ID
+      
+      // Send to the target room/user
+      io.to(data.chat).emit('newMessage', newMessage);
+      
+      // If it's a private chat, also send to sender's own socket so they see it
+      // (For rooms, sender is already IN the room, so io.to(room) covers it)
+      const isPrivate = data.chat.includes('@');
+      if (isPrivate) {
+        socket.emit('newMessage', newMessage);
+      }
+    } else {
+      // General message
+      io.to('general').emit('newMessage', newMessage);
+    }
   });
 
   // ----- CALLS -----

@@ -1,31 +1,31 @@
 import styles from './SideBar.module.css'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
+import AddChatModal from '../modals/AddChatModal'
 
 interface SideBarProps {
   onlineUsers: string[]
   currentChat: string | null
   setCurrentChat: (chat: string | null) => void
+  onJoinChat: (chat: string) => void
 }
 
-const SideBar = ({ onlineUsers, currentChat, setCurrentChat }: SideBarProps) => {
+const SideBar = ({ onlineUsers, currentChat, setCurrentChat, onJoinChat }: SideBarProps) => {
   const [chats, setChats] = useState<string[]>([])
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const handleAddChat = () => {
-    const username = prompt('Enter username')
-
-    if (!username) return
-
+  const handleAddChat = (chatName: string) => {
     setChats(prev => {
-      if (prev.includes(username)) return prev
-      return [...prev, username]
+      if (prev.includes(chatName)) return prev
+      return [...prev, chatName]
     })
+    onJoinChat(chatName)
   }
 
   return (
     <aside className={styles.sidebar}>
       <h3>Online ({onlineUsers.length})</h3>
-      <button onClick={handleAddChat} className={styles.addChatBtn}>
+      <button onClick={() => setIsModalOpen(true)} className={styles.addChatBtn}>
         Add Chat
       </button>
       <Link to="/profile">Profile</Link>
@@ -45,6 +45,12 @@ const SideBar = ({ onlineUsers, currentChat, setCurrentChat }: SideBarProps) => 
           <li key={chat} onClick={() => setCurrentChat(chat)} className={currentChat === chat ? styles.active : ''}>{chat}</li>
         ))}
       </ul>
+
+      <AddChatModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onAddChat={handleAddChat} 
+      />
     </aside>
   )
 }

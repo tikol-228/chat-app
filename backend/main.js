@@ -220,21 +220,49 @@ io.on('connection', (socket) => {
   // ----- CALLS -----
 
   socket.on('call', ({ to }) => {
-    const calleeSocket = Array.from(io.sockets.sockets.values()).find(s => s.user && s.user.email === to);
-    if (calleeSocket) {
-      calleeSocket.emit('incomingCall', { from: socket.user.email, roomId: `${socket.user.email}-${to}` });
+    // If 'to' is missing or 'general', broadcast to the general room
+    if (!to || to === 'general') {
+      // Broadcast to everyone in 'general' room EXCEPT the sender
+      socket.to('general').emit('incomingCall', { 
+        from: socket.user.email, 
+        roomId: `general-${socket.user.email}` 
+      });
+    } else {
+      const calleeSocket = Array.from(io.sockets.sockets.values()).find(s => s.user && s.user.email === to);
+      if (calleeSocket) {
+        calleeSocket.emit('incomingCall', { from: socket.user.email, roomId: `${socket.user.email}-${to}` });
+      }
     }
   });
 
   socket.on('acceptCall', ({ roomId }) => {
     socket.join(roomId);
     socket.voiceRoomId = roomId;
-    const callerEmail = roomId.split('-')[0];
-    const callerSocket = Array.from(io.sockets.sockets.values()).find(s => s.user && s.user.email === callerEmail);
-    if (callerSocket) {
-      callerSocket.join(roomId);
-      callerSocket.voiceRoomId = roomId;
-      io.to(roomId).emit('callAccepted');
+
+    // Determine if it's a general call or private call
+    // General call ID format: general-callerEmail
+    // Private call ID format: callerEmail-calleeEmail
+    
+    if (roomId.startsWith('general-')) {
+       const callerEmail = roomId.split('general-')[1];
+       const callerSocket = Array.from(io.sockets.sockets.values()).find(s => s.user && s.user.email === callerEmail);
+       if (callerSocket) {
+          // Tell caller that someone accepted
+          callerSocket.emit('callAccepted', { roomId });
+          callerSocket.join(roomId);
+          callerSocket.voiceRoomId = roomId;
+          
+          // Notify everyone else in general that call is taken (optional, but good UX)
+          // io.to('general').emit('callTaken', { roomId }); 
+       }
+    } else {
+       const callerEmail = roomId.split('-')[0];
+       const callerSocket = Array.from(io.sockets.sockets.values()).find(s => s.user && s.user.email === callerEmail);
+       if (callerSocket) {
+         callerSocket.join(roomId);
+         callerSocket.voiceRoomId = roomId;
+         io.to(roomId).emit('callAccepted');
+       }
     }
   });
 

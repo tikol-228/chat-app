@@ -184,17 +184,24 @@ const ChatLayout = () => {
   }
 
   const startCall = async () => {
-    if (!currentChat || !socket) return
+    // Allow call if currentChat is missing (General) OR if it is set
+    if (!socket) return
     
-    setRemoteUser(currentChat)
+    // If currentChat is null, it's a general call
+    const target = currentChat || 'General Chat'
+    setRemoteUser(target)
     setActiveCall(true)
     
-    // Create room ID: myEmail-targetEmail
-    const roomId = `${user?.email}-${currentChat}`
+    // Create room ID
+    // General: general-myEmail
+    // Private: myEmail-targetEmail
+    const roomId = currentChat 
+      ? `${user?.email}-${currentChat}`
+      : `general-${user?.email}`
     
     const pc = await setupPeerConnection()
     if (pc) {
-      socket.emit('call', { to: currentChat })
+      socket.emit('call', { to: currentChat || 'general' })
       // We wait for 'acceptCall' to start negotiation
       socket.emit('webrtc:join', { roomId })
     }

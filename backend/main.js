@@ -80,19 +80,30 @@ app.get('/', (req, res) => {
 });
 
 app.post('/api/register', async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password)
-    return res.status(400).json({ error: 'Name, email, and password are required' });
+  const { name, email, password, username } = req.body;
+  if (!name || !email || !password || !username)
+    return res.status(400).json({ error: 'Name, email, password, and username are required' });
 
   if (users.find(user => user.email === email))
-    return res.status(400).json({ error: 'User already exists' });
+    return res.status(400).json({ error: 'Email already exists' });
+
+  if (users.find(user => user.username === username))
+    return res.status(400).json({ error: 'Username already taken' });
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const user = { id: Date.now(), name, email, password: hashedPassword };
+  const user = { 
+    id: Date.now(), 
+    name, 
+    email, 
+    username: username.startsWith('@') ? username : `@${username}`, 
+    password: hashedPassword,
+    about: '',
+    avatar: ''
+  };
   users.push(user);
 
-  const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
-  res.status(201).json({ token, user: { id: user.id, name: user.name, email: user.email } });
+  const token = jwt.sign({ id: user.id, email: user.email, username: user.username }, JWT_SECRET);
+  res.status(201).json({ token, user: { id: user.id, name: user.name, email: user.email, username: user.username } });
 });
 
 app.post('/api/login', async (req, res) => {
@@ -104,8 +115,42 @@ app.post('/api/login', async (req, res) => {
   if (!user || !(await bcrypt.compare(password, user.password)))
     return res.status(401).json({ error: 'Invalid credentials' });
 
-  const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET);
-  res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
+  const token = jwt.sign({ id: user.id, email: user.email, username: user.username }, JWT_SECRET);
+  res.json({ token, user: { id: user.id, name: user.name, email: user.email, username: user.username } });
+});
+
+app.get('/api/users/search', authenticateToken, (req, res) => {
+  const { q } = req.query;
+  if (!q) return res.json([]);
+
+  const query = q.toLowerCase();
+  const foundUsers = users
+    .filter(u => 
+      (u.username && u.username.toLowerCase().includes(query)) || 
+      (u.name && u.name.toLowerCase().includes(query))
+    )
+    .map(u => ({ username: u.username, name: u.name, email: u.email })); // Don't return passwords
+  
+  res.json(foundUsers);
+});
+
+app.put('/api/profile', authenticateToken, (req, res) => {
+  const { username, about, avatar } = req.body;
+  const user = users.find(u => u.email === req.user.email);
+  
+  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  if (username && username !== user.username) {
+    if (users.find(u => u.username === username)) {
+      return res.status(400).json({ error: 'Username already taken' });
+    }
+    user.username = username;
+  }
+  
+  if (about !== undefined) user.about = about;
+  if (avatar !== undefined) user.avatar = avatar;
+
+  res.json({ user: { id: user.id, name: user.name, email: user.email, username: user.username, about: user.about, avatar: user.avatar } });
 });
 
 app.get('/api/messages', authenticateToken, (req, res) => {

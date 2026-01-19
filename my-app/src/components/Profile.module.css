@@ -21,12 +21,43 @@
   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
 
-.avatar {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #3b82f6;
+.editBtn {
+  margin-left: auto;
+  padding: 10px 20px;
+  background: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.editBtn:hover {
+  background: #2563eb;
+}
+
+.editInput {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  width: 100%;
+}
+
+.editTextarea {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 12px;
+  border-radius: 8px;
+  color: white;
+  width: 100%;
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
 }
 
 .mainInfo {
